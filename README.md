@@ -1,7 +1,3 @@
-# api_final
-api final
-asdasdsa
-=======
 # Описание
 
 1. Проект из себя представляет API для проекта "api_final_yatube"
