@@ -68,3 +68,17 @@ class Follow(models.Model):
         User, on_delete=models.CASCADE,
         related_name='follower'
     )
+
+    class Meta:
+        """Класс определяет метаданные для модели Follow."""
+
+        constraints = [
+            models.CheckConstraint(
+                name='%(app_label)s_%(class)s_prevent_self_follow',
+                check=~models.Q(user=models.F('following')),
+            ),
+            models.UniqueConstraint(
+                fields=['following', 'user'],
+                name='%(app_label)s_%(class)s_unique_relationships'
+            )
+        ]

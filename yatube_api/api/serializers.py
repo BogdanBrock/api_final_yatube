@@ -1,11 +1,11 @@
 """Сериализаторы для работы с моделями приложения API."""
 
 import base64
+
 from django.contrib.auth import get_user_model
 from django.core.files.base import ContentFile
 from rest_framework import serializers
 from rest_framework.validators import UniqueTogetherValidator
-
 
 from posts.models import Comment, Post, Group, Follow
 
@@ -26,42 +26,20 @@ class Base64ImageField(serializers.ImageField):
         return super().to_internal_value(data)
 
 
-class GroupSerializer(serializers.ModelSerializer):
-    """Сериализатор для модели Group."""
-
-    class Meta:
-        """Класс определяет метаданные для сериализатора GroupSerializer."""
-
-        fields = ('id', 'title', 'description', 'slug')
-        model = Group
-
-
 class PostSerializer(serializers.ModelSerializer):
-    """Сериализатор для модели Comment."""
+    """Сериализатор для модели Post."""
 
     author = serializers.SlugRelatedField(
         slug_field='username',
         read_only=True
     )
-    image = Base64ImageField(required=False, allow_null=True)
-
-    def update(self, instance, validated_data):
-        """Функция для обновления данных."""
-        instance.text = validated_data.get('text', instance.text)
-        instance.pub_date = validated_data.get('pub_date', instance.pub_date)
-        instance.image = validated_data.get('image', instance.image)
-        instance.author = validated_data.get('author', instance.author)
-        instance.group = validated_data.get('group', instance.group)
-
-        instance.save()
-        return instance
+    image = serializers.ImageField(required=False, allow_null=True)
 
     class Meta:
-        """Класс определяет метаданные для сериализатора CommentSerializer."""
+        """Класс определяет метаданные для сериализатора PostSerializer."""
 
         fields = ('id', 'text', 'pub_date', 'image', 'author', 'group')
         model = Post
-        read_only_fields = ('group',)
 
 
 class CommentSerializer(serializers.ModelSerializer):
@@ -80,6 +58,16 @@ class CommentSerializer(serializers.ModelSerializer):
         read_only_fields = ('post',)
 
 
+class GroupSerializer(serializers.ModelSerializer):
+    """Сериализатор для модели Group."""
+
+    class Meta:
+        """Класс определяет метаданные для сериализатора GroupSerializer."""
+
+        fields = ('id', 'title', 'description', 'slug')
+        model = Group
+
+
 class FollowSerializer(serializers.ModelSerializer):
     """Сериализатор для модели Follow."""
 
@@ -96,7 +84,7 @@ class FollowSerializer(serializers.ModelSerializer):
     class Meta:
         """Класс определяет метаданные для сериализатора FollowSerializer."""
 
-        fields = ('id', 'user', 'following')
+        fields = ('user', 'following')
         model = Follow
         validators = [
             UniqueTogetherValidator(
@@ -106,10 +94,10 @@ class FollowSerializer(serializers.ModelSerializer):
             )
         ]
 
-    def validate(self, data):
+    def validate_following(self, value):
         """Функция, где нельзя подписаться на самого себя."""
-        if data['following'] == data['user']:
+        if value == self.context['request'].user:
             raise serializers.ValidationError(
                 'Нельзя подписаться на самого себя'
             )
-        return data
+        return value
