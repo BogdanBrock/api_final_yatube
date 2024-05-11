@@ -2,17 +2,19 @@
 
 from django.contrib.auth import get_user_model
 from django.shortcuts import get_object_or_404
-from rest_framework import viewsets, permissions, filters, mixins
+from rest_framework import filters, permissions, viewsets
 from rest_framework.pagination import LimitOffsetPagination
 
-from posts.models import Post, Comment, Follow, Group
+from posts.models import Comment, Follow, Group, Post
+from .permissions import IsOwnerOrReadOnly
 from .serializers import (
-    PostSerializer,
     CommentSerializer,
     FollowSerializer,
-    GroupSerializer
+    GroupSerializer,
+    PostSerializer,
+
 )
-from .permissions import IsOwnerOrReadOnly
+from .viewsets import CreateListViewSet
 
 
 User = get_user_model()
@@ -50,9 +52,8 @@ class CommentViewSet(viewsets.ModelViewSet):
 
     def get_queryset(self):
         """Получение записи авторизированным пользователем."""
-        post_id = self.kwargs.get('post_id')
         post = self.get_object_post()
-        return post.comments.filter(post_id=post_id)
+        return post.comments.all()
 
     def perform_create(self, serializer):
         """Создание записи без указания номера поста и автора в запросе."""
@@ -70,14 +71,11 @@ class GroupViewSet(viewsets.ReadOnlyModelViewSet):
     queryset = Group.objects.all()
     serializer_class = GroupSerializer
     permission_classes = [
-        permissions.IsAuthenticatedOrReadOnly
+        permissions.AllowAny
     ]
 
 
-class FollowViewSet(mixins.CreateModelMixin,
-                    mixins.RetrieveModelMixin,
-                    mixins.ListModelMixin,
-                    viewsets.GenericViewSet):
+class FollowViewSet(CreateListViewSet):
     """Представление для модели Follow."""
 
     queryset = Follow.objects.all()
@@ -85,6 +83,10 @@ class FollowViewSet(mixins.CreateModelMixin,
     filter_backends = [filters.SearchFilter]
     search_fields = ('following__username',)
 
+    def perform_create(self, serializer):
+        """Создание записи без указания номера поста и автора в запросе."""
+        serializer.save(user=self.request.user)
+
     def get_queryset(self):
         """Получение записи по фильтру."""
-        return self.request.user.follower.filter(user=self.request.user)
+        return self.request.user.follower.all()

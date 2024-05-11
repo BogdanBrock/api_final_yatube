@@ -7,7 +7,7 @@ from django.core.files.base import ContentFile
 from rest_framework import serializers
 from rest_framework.validators import UniqueTogetherValidator
 
-from posts.models import Comment, Post, Group, Follow
+from posts.models import Comment, Follow, Group, Post
 
 
 User = get_user_model()
@@ -33,7 +33,6 @@ class PostSerializer(serializers.ModelSerializer):
         slug_field='username',
         read_only=True
     )
-    image = serializers.ImageField(required=False, allow_null=True)
 
     class Meta:
         """Класс определяет метаданные для сериализатора PostSerializer."""
@@ -73,7 +72,7 @@ class FollowSerializer(serializers.ModelSerializer):
 
     user = serializers.SlugRelatedField(
         slug_field='username',
-        queryset=User.objects.all(),
+        read_only=True,
         default=serializers.CurrentUserDefault()
     )
     following = serializers.SlugRelatedField(
