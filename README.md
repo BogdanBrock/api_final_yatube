@@ -1,4 +1,10 @@
-# Описание
+## 💻 Технологии:
+[![Python](https://img.shields.io/badge/-Python-464646?style=flat&logo=Python&logoColor=56C0C0&color=008080)](https://www.python.org/)
+[![Django](https://img.shields.io/badge/-Django-464646?style=flat&logo=Django&logoColor=56C0C0&color=008080)](https://www.djangoproject.com/)
+[![Django REST Framework](https://img.shields.io/badge/-Django%20REST%20Framework-464646?style=flat&logo=Django%20REST%20Framework&logoColor=56C0C0&color=008080)](https://www.django-rest-framework.org/)
+
+
+## Описание проекта
 
 1. Проект из себя представляет API для проекта "api_final_yatube"
 
@@ -10,10 +16,9 @@
 3.Польза его заключается в том, что он помогает пользователю взаимодействовать с сервером
 
 
-# Установка
+## Установка
 
 Клонировать репозиторий и перейти в него в командной строке:
-
 ```
 git clone https://github.com/yandex-praktikum/kittygram.git
 ```
@@ -23,7 +28,6 @@ cd kittygram
 ```
 
 Cоздать и активировать виртуальное окружение:
-
 ```
 python3 -m venv env
 ```
