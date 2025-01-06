@@ -58,7 +58,7 @@ python3 manage.py migrate
 python3 manage.py runserver
 ```
 
-# Примеры запросов к API
+## Примеры запросов к API
 
 1. Для создания токена нужно выполнить такой запрос "http://127.0.0.1:8000/api/v1/jwt/create/", где указываем поля "username" и "password" 
 
